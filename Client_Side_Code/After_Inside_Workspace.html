@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Welcome to workspace</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: auto; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<script>
+
+
+	function getworkspaceUsers() {
+		
+		
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		
+		
+		var jsObject = new Object();
+		jsObject.workspace_id = workspace_id;
+		
+		var jsonString = JSON.stringify(jsObject);
+		
+		var xmlhttpone = new XMLHttpRequest();
+		var txt = "";
+		xmlhttpone.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+	 	 		var myObj = JSON.parse(this.responseText);
+	 	    	
+	 	 		for (x in myObj.workspace_user) {
+	 	    		var user_name = myObj.workspace_user[x].user_name;
+	 	    		var w_usertype = myObj.workspace_user[x].w_usertype;
+	 	    		 
+	 	    		if(w_usertype === "Admin") {
+	 	    			txt += " " + user_name + "<br>";
+	 	    		} else {
+	 	    			txt += " " + user_name + " (" + w_usertype + ") ";
+	 	    			txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+	 	    		}
+	 	    		//txt += " " + user_name + " (" + w_usertype + ") ";
+	 	    		
+	 	    		
+	 	    		
+	 	    		//txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+	 	    	}
+	 	    	
+	 	 		//alert(txt);
+	 	    	document.getElementById("workspace_users").innerHTML = txt;
+	 	 		
+	 	 	}
+		}
+		
+		
+		
+		xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getWorkspaceUsers", false);
+		xmlhttpone.setRequestHeader("Content-type", "application/json");
+		xmlhttpone.send(jsonString);
+	}
+
+</script>
+
+<script>
+
+	function upgradeToAdmin(user_name) {
+		//alert(user_name);
+	var workspace_id = sessionStorage.getItem("workspaceID");
+		
+		
+		var jsObject = new Object();
+		jsObject.user_name = user_name;
+		jsObject.workspace_id = workspace_id;
+		
+		var jsonString = JSON.stringify(jsObject);
+		
+		var xmlhttpone = new XMLHttpRequest();
+		
+		xmlhttpone.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+	 	 		
+	 	    	
+	 	    	//alert("updated user");
+	 	 		
+	 	 	}
+		}
+		
+		
+		
+		xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/upgradeToAdmin", false);
+		xmlhttpone.setRequestHeader("Content-type", "application/json");
+		xmlhttpone.send(jsonString);
+	}
+
+</script>
+
+
+
+<script>
+
+function getCurrentChannels() {
+	//window.alert("reaching here!");
+	var user_id = sessionStorage.getItem("userID");
+	var workspace_id = sessionStorage.getItem("workspaceID");
+	
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	jsObject.workspace_id = workspace_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	var txt;
+	var xmlhttpone = new XMLHttpRequest();
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		var myObj = JSON.parse(this.responseText);
+ 	    	//document.getElementById("demo").innerHTML = this.responseText;
+ 	  //  	alert("should get now");
+ 	    	txt = "<p> your current channels are, <br>";
+ 	    	txt += "<form name = \"getToChannel\" action = \"javascript:goToChannel();\" >";
+ 	    	for (x in myObj.channels) {
+ 	    		var channel_name = myObj.channels[x].channel_name;
+ 	    		
+ 	    		txt += "<input name = \"channel\" type = \"radio\"  value = \"" + channel_name + "\">" + channel_name + "</input> <br>";
+ 	    	}
+ 	    	txt += "<input type = \"submit\" value = \"submit\"/>";  
+ 	    	txt += "</form>";
+ 	    	txt += "</p>";
+ 	    //	alert(txt)
+ 	    	document.getElementById("put_here").innerHTML = txt;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getCurrentChannels", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+	
+}
+
+
+</script>
+
+
+<script>
+
+function goToChannel() {
+
+	//alert("in goToChannel");
+	var channel_name = document.forms["getToChannel"]["channel"].value;
+	var workspace_id = sessionStorage.getItem("workspaceID");
+	//alert(channel_name);
+	
+	var jsObject = new Object();
+	jsObject.channel_name = channel_name;
+	jsObject.workspace_id = workspace_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	var xmlhttpone = new XMLHttpRequest();
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 //		alert("unexpected json: " + this.responseText);
+ 	 		var myObj = JSON.parse(this.responseText);
+ 	    	//document.getElementById("demo").innerHTML = this.responseText;
+ 	    	var channel_id = myObj.channel_id;
+ 	   // 	window.alert("channel id is " + channel_id);
+ 	    	sessionStorage.setItem("channelID", channel_id);
+ 	    	location.href = "http://localhost:8082/JAX-RS-Starter/After_Inside_Channel.html";
+ 	   		
+ 	 		
+ 	 	}
+	}
+	
+	//window.alert(jsonString);
+	
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getChannelId", false);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+
+
+</script>
+
+<script>
+
+function checkChannelInvites() {
+	
+	var user_id = sessionStorage.getItem("userID");
+	var workspace_id = sessionStorage.getItem("workspaceID");
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	jsObject.workspace_id = workspace_id;
+	var jsonString = JSON.stringify(jsObject);
+	
+	var channel_name;
+	
+	var xmlhttp = new XMLHttpRequest();
+	var txt = "";
+	var x;
+	xmlhttp.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+    	var myObj = JSON.parse(this.responseText);
+    	//document.getElementById("demo").innerHTML = this.responseText;
+    	
+    	txt += "<p> your invites are, <br>"
+    	for (x in myObj.channels) {
+    		var channel_name = myObj.channels[x].channel_name;
+    		var channel_id = getChannelId(channel_name, workspace_id);
+    		txt += "channel name:" + channel_name;
+    		 
+    		txt += "<t> <button onclick = \"acceptFunc(" + channel_id + ")\"> accept </button>  <button> decline </button><br>";
+    	}
+    	txt += "</p>"
+    	document.getElementById("demo").innerHTML = txt;
+    	
+    	
+  		}
+	};
+	
+xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/checkChannelInvites", true);
+xmlhttp.setRequestHeader("Content-type", "application/json");
+xmlhttp.send(jsonString);
+
+}
+
+</script>
+
+<script>
+
+function getChannelId(channel_name, workspace_id) {
+	
+	var jsObject = new Object();
+	jsObject.channel_name = channel_name;
+	jsObject.workspace_id = workspace_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	var channelID;
+	
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			var returnedJson = JSON.parse(this.responseText);
+			
+			channelID = returnedJson.channel_id;
+	
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getChannelId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return channelID;
+	
+	
+	
+}
+
+
+</script>
+
+
+<script>
+function acceptFunc(channel_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	//alert("should accept now");
+	//alert(channel_id);
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.channel_id = channel_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("demo").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/acceptChannelInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+<script>
+function declineFunc(workspace_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("demo").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/declineWorkspaceInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+</head>
+<body>
+
+<a href = "After_Login.html"><input type="button" value="Your Home!" style="float: right;"> </a>
+<h2 align = "center"> Welcome To your workspace </h2> 
+
+<div id = "rcorners2">
+
+<a href = "Send_Workspace_Invite.html"><button>Send Workspace Invite</button></a> 
+<br>
+<br>
+<a href="Create_Channel.html"><button>Create a Channel</button></a> 
+<br>
+<br>
+<button onclick = "checkChannelInvites()">Check Channel Invites</button>
+<p id = "demo"> </p>
+<br>
+<br>
+<button onclick = "getCurrentChannels()"> Your current channels! </button>
+ 	<p id = "put_here"> </p>
+<button onclick = "getworkspaceUsers()"> Current Workspace Users </button>
+ 	<p id = "workspace_users"> </p>
+
+
+
+</div>
+
+
+</body>
+</html>

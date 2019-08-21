@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chat - Customer Module</title>
+<link type="text/css" rel="stylesheet" href="style.css" />
+</head>
+ 
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+<script>
+
+	function sendMessage() {
+		
+		var user_id = sessionStorage.getItem("userID");
+		var channel_id = sessionStorage.getItem("channelID");
+		var message = document.forms["message"]["usermsg"].value;
+		
+		
+		var jsObject = new Object();
+		jsObject.user_id = user_id;
+		jsObject.channel_id = channel_id;
+		jsObject.message = message;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+				//alert("message sent");
+				document.forms["message"]["usermsg"].value = "";
+				receiveMessage();
+	 	 	
+	 	 	}
+		};
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/sendChannelMessages", true);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+		
+		
+		
+		
+	}
+</script>
+
+<script>
+	
+	function receiveMessage() {
+		
+		var user_id = sessionStorage.getItem("userID");
+		var channel_id = sessionStorage.getItem("channelID");
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		//var message = document.forms["message"]["usermsg"].value;
+		
+		var jsObject = new Object();
+		jsObject.user_id = user_id;
+		jsObject.channel_id = channel_id;
+		jsObject.workspace_id = workspace_id;
+		//jsObject.message = message;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+	 	 		//alert("reched here");
+				//alert(this.responseText);
+				var txt = "";
+				var myObj = JSON.parse(this.responseText);
+		    	
+		    	
+		    	
+		    	for (x in myObj.messages) {
+		    		txt += myObj.messages[x].user_name;
+		    		txt += " - ";
+		    		txt += myObj.messages[x].channel_message;
+		    		txt += "<br>";
+		    		//alert(txt);
+		    	}
+		    	
+		    	document.getElementById("messageBox").innerHTML = txt;
+		    	
+		    	
+	 	 	
+	 	 	}
+		};
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/receiveChannelMessages", true);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	}
+
+
+</script>
+
+
+
+
+<body onload = "receiveMessage()">
+
+<div id="wrapper">
+    <div id="menu">
+        <p class="welcome">Welcome to Channel message box, <b></b></p>
+        <p class="logout"><a id="exit" href="After_Inside_Channel.html">Channel Home</a></p>
+        <div style="clear:both"></div>
+    </div>
+     
+    <div id="chatbox">
+    
+    <p id = "messageBox"> </p>
+    
+    
+    </div>
+     
+    <form name="message" action="javascript:sendMessage();">
+        <input name="usermsg" type="text" id="usermsg" size="63" />
+        <input name="submitmsg" type="submit"  id="submitmsg" value="Send" />
+    </form>
+</div>
+
+
+
+</body>
+</html>

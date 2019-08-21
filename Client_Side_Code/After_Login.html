@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Welcome User</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: auto; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<script> 
+
+function checkWorkspaceInvites() {
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	var jsonString = JSON.stringify(jsObject);
+	
+	
+	var xmlhttp = new XMLHttpRequest();
+	var txt = "";
+	var x;
+	var workspaceName;
+	var workspace_id;
+	xmlhttp.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+    	var myObj = JSON.parse(this.responseText);
+    	//document.getElementById("demo").innerHTML = this.responseText;
+    	
+    	txt += "<p> your invites are, <br>"
+    	for (x in myObj.workspaces) {
+    		txt += "" + myObj.workspaces[x].workspace_name;
+    		workspaceName = myObj.workspaces[x].workspace_name;
+    		workspace_id = getWorkspaceId(workspaceName);
+    		txt += "<t> <button onclick = \"acceptFunc(" + workspace_id + ")\"> accept </button>  <button onclick = \"declineFunc(" + workspace_id + ")\" > decline </button><br>";
+    	}
+    	txt += "</p>"
+    	document.getElementById("demo").innerHTML = txt;
+    	
+    	
+  		}
+	};
+xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/checkWorkspaceInvites", true);
+xmlhttp.setRequestHeader("Content-type", "application/json");
+xmlhttp.send(jsonString);
+
+}
+</script>
+
+<script>
+
+function getWorkspaceId(workspace_name) {
+	
+	
+		
+	var jsObject = new Object();
+	jsObject.workspace_name = workspace_name;
+	
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	var workspaceID;
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			var returnedJson = JSON.parse(this.responseText);
+			
+			workspaceID = returnedJson.workspace_id;
+			
+			
+			
+			
+			
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getWorkspaceId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return workspaceID;
+}
+
+</script>
+
+
+<script>
+function acceptFunc(workspace_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("demo").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/acceptWorkspaceInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+<script>
+function declineFunc(workspace_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("demo").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/declineWorkspaceInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+
+
+
+
+
+
+<script>
+
+function getCurrentWorkspaces() {
+	//window.alert("reaching here!");
+	var user_id = sessionStorage.getItem("userID");
+	
+	
+	//window.alert("from session storage :" + user_id);
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	
+	var xmlhttpone = new XMLHttpRequest();
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState === 4 && this.status === 200) {
+ 	 		var myObj = JSON.parse(this.responseText);
+ 	 		var x;
+ 	 		
+ 	    	//document.getElementById("demo").innerHTML = this.responseText;
+ 	    	
+ 	    	
+ 	    	
+ 	    	
+ 	    	
+ 	    	var txt = "<p> your current workspaces are, <br>";
+ 	    	txt += "<form name = \"getToWorkspace\" action = \"javascript:goToWorkspace();\">";
+ 	    	for (x in myObj.workspaces) {
+ 	    		var workspace_name = myObj.workspaces[x].workspace_name;
+ 	    		
+ 	    		txt += "<input name = \"work\" type = \"radio\"  value = \"" + workspace_name + "\">" + workspace_name + "</input> <br>";
+ 	    	}
+ 	    	txt += "<input type = \"submit\" value = \"submit\"/>";  
+ 	    	txt += "</form>";
+ 	    	txt += "</p>";
+ 	    	//window.alert(txt);
+ 	    	document.getElementById("put_here").innerHTML = txt;
+ 	 		
+ 	 	}
+	}
+	
+	//window.alert("now going for the call");
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getCurrentWorkspaces", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+	
+}
+
+
+</script>
+
+<script>
+
+	function goToWorkspace() {
+
+		
+		var workspace_name = document.forms["getToWorkspace"]["work"].value;
+		//alert(workspace_name);
+		
+		var jsObject = new Object();
+		jsObject.workspace_name = workspace_name;
+		
+		var jsonString = JSON.stringify(jsObject);
+		
+		var xmlhttpone = new XMLHttpRequest();
+		
+		xmlhttpone.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+	 	 		var myObj = JSON.parse(this.responseText);
+	 	    	//document.getElementById("demo").innerHTML = this.responseText;
+	 	    	var workspace_id = myObj.workspace_id;
+	 	    	//window.alert("workspace id is " + workspace_id);
+	 	    	sessionStorage.setItem("workspaceID", workspace_id);
+	 	    	location.href = "http://localhost:8082/JAX-RS-Starter/After_Inside_Workspace.html";
+	 	   		
+	 	 		
+	 	 	}
+		}
+		
+		//window.alert(jsonString);
+		
+		xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getWorkspaceId", true);
+		xmlhttpone.setRequestHeader("Content-type", "application/json");
+		xmlhttpone.send(jsonString);
+		
+	}
+</script>
+
+
+<script>
+
+	function clearWorkspaceSession() {
+		sessionStorage.removeItem("workspaceID");
+	}
+
+</script>
+
+
+</head>
+
+
+
+
+<body onload = "clearWorkspaceSession()">
+
+<a href = "Snickr_Homepage.html"><input type="button" value="Sign Out!" style="float: right;"> </a>
+<h2 align = "center"> Welcome User </h2> 
+
+
+<div id = "rcorners2" >
+	<a href="Create_Workspace.html"><button>Create a Workspace</button></a> 
+	<br>
+	<br>
+	<button onclick = "checkWorkspaceInvites()">Check Workspace Invites</button>
+	<p id = "demo"> </p>
+	<br>
+	<br>
+	<button onclick = "getCurrentWorkspaces()"> Your current workspaces! </button>
+ 	<p id = "put_here"> </p>
+	
+
+</div>
+
+
+
+</body>
+</html>

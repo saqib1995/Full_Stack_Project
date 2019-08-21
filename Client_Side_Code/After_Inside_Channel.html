@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: auto; 
+  margin:auto;
+}
+</style>
+
+<script>
+
+function getChannelUsers() {
+	
+	
+	var channel_id = sessionStorage.getItem("channelID");
+	
+	
+	var jsObject = new Object();
+	jsObject.channel_id = channel_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	var xmlhttpone = new XMLHttpRequest();
+	var txt = "";
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		var myObj = JSON.parse(this.responseText);
+ 	    	
+ 	 		for (x in myObj.channel_user) {
+ 	    		var user_name = myObj.channel_user[x].user_name;
+ 	    		var c_usertype = myObj.channel_user[x].c_usertype;
+ 	    		 
+ 	    		if(c_usertype === "creator") {
+ 	    			txt += " " + user_name + "<br>";
+ 	    		} else {
+ 	    			txt += " " + user_name + " (" + c_usertype + ")<br> ";
+ 	    			//txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+ 	    		}
+ 	    		//txt += " " + user_name + " (" + w_usertype + ") ";
+ 	    		
+ 	    		
+ 	    		
+ 	    		//txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+ 	    	}
+ 	    	
+ 	 		//alert(txt);
+ 	    	document.getElementById("channel_users").innerHTML = txt;
+ 	 		
+ 	 	}
+	}
+	
+	
+	
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getChannelUsers", false);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+}
+
+
+</script>
+
+
+</head>
+<body>
+
+<a href = "After_Inside_Workspace.html"><input type="button" value="Workspace Home!" style="float: right;"> </a>
+<h2 align = "center"> Welcome to Channel! </h2> 
+
+
+<div id = "rcorners2" >
+	<a href="Send_Channel_Invite.html"><button>Send Channel Invite</button></a> 
+	<br>
+	<br>
+	<a href = "Channel_Message_Box.html"><button>Channel Message Box</button></a>
+	<br>
+	<br>
+	<button onclick = "getChannelUsers()"> Current Channel Users </button>
+ 	<p id = "channel_users"> </p>
+	<br>
+	<br>
+ 	
+	
+
+</div>
+
+
+
+</body>
+</html>

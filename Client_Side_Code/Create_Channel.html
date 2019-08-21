@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Create_Channel</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 200px; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+	<script>
+	
+	function createChannelFunc() {
+		
+		
+		var user_id = sessionStorage.getItem("userID");
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		var channel_name = document.forms["createChannelForm"]["c_name"].value;
+		var channel_type = document.forms["createChannelForm"]["c_type"].value;
+		//alert(channel_type);
+		
+		if(user_id == "") {
+			window.alert("invalid user id");
+		}
+	
+		if(workspace_id == "") {
+			window.alert("invalid workspace id");
+		}
+		
+		if(channel_name == "") {
+			window.alert("Please enter name of the channel");
+		}
+	
+		if(channel_type == "") {
+			window.alert("Please enter name of the channel");
+		}
+		
+		
+		
+		
+		var jsObject = new Object();
+		jsObject.user_id = user_id;
+		jsObject.workspace_id = workspace_id;
+		jsObject.channel_name = channel_name;
+		jsObject.channel_type = channel_type;
+		
+		var jsonString = JSON.stringify(jsObject);
+				
+		var xmlhttp = new XMLHttpRequest();
+		
+		var channel_id;
+		
+	
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				channel_id = getChannelId(channel_name, workspace_id);
+				
+				document.getElementById("demo").innerHTML = this.responseText;
+				
+				if(channel_type === "public") {
+					//alert("now users whould be added");
+					//alert("this is the latest one" + channel_id);
+					addAllWorkspaceUsers(channel_id);
+				}
+				
+				location.href = "http://localhost:8082/JAX-RS-Starter/Send_Channel_Invite.html";
+				
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/createChannel", false);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+		
+		
+		
+	}
+
+</script>
+
+<script>
+
+	function addAllWorkspaceUsers(channel_id) {
+		
+		
+		
+		
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		
+		//alert(channel_id);
+		
+		var jsObject = new Object();
+		jsObject.channel_id = channel_id;
+		jsObject.workspace_id = workspace_id;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/addAllUser", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				
+				
+			}
+		}
+		
+		
+		
+	}
+
+
+
+</script>
+
+
+
+<script>
+
+	function getChannelId(channel_name, workspace_id) {
+		//var channel_name = document.forms["createChannelForm"]["c_name"].value;
+		//var workspace_id = sessionStorage.getItem("workspaceID");
+		//alert("in get channel id");
+		var jsObject = new Object();
+		jsObject.channel_name = channel_name;
+		jsObject.workspace_id = workspace_id;
+		
+		
+		var channelID;
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+		
+		
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				var returnedJson = JSON.parse(this.responseText);
+				
+				channelID = returnedJson.channel_id;
+				
+				sessionStorage.setItem("channelID" , channelID);
+				
+				//location.href("http://localhost:8082/JAX-RS-Starter/After_Inside_Channel.html");
+				
+				
+			}
+		}
+		
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getChannelId", false);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+		return channelID;
+		
+		
+	}
+
+</script>
+
+
+
+</head>
+<body>
+	<form name = "createChannelForm" id = "rcorners2" action = "javascript:createChannelFunc();" method = "post">
+		<p>
+			Channel Name : <input type="text" name="c_name" />
+		</p>
+		<p>
+			<input type="radio" name="c_type" value="public"> Public<br>
+			<input type="radio" name="c_type" value="private"> Private<br>
+			<input type="radio" name="c_type" value="personal"> Personal
+		</p>
+		
+		<input type="submit" value="Create Channel" />
+	
+	</form>
+	
+	<p id = "demo"> </p>
+	
+
+</body>
+</html>

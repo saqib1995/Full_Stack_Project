@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Send Workspace Invite</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 100px; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+<script>
+
+function getUsersToInvite() {
+	
+	var workspace_id = sessionStorage.getItem("workspaceID");
+	
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	var xmlhttpone = new XMLHttpRequest();
+	var txt = "";
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		var myObj = JSON.parse(this.responseText);
+ 	    	
+ 	 		for (x in myObj.snickr_user) {
+ 	    		var user_name = myObj.snickr_user[x].user_name;
+ 	    		var user_email = myObj.snickr_user[x].user_email;
+ 	    		 
+ 	    		//if(w_usertype === "Admin") {
+ 	    			//txt += " " + user_name + "<br>";
+ 	    		//} else {
+ 	    			txt += " " + user_name + " (" + user_email + ")<br> ";
+ 	    			//txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+ 	    		//}
+ 	    		//txt += " " + user_name + " (" + w_usertype + ") ";
+ 	    		
+ 	    		
+ 	    		
+ 	    		//txt += "<button onclick=\'upgradeToAdmin(\"" + user_name + "\")\'> make admin</button><br>";
+ 	    	}
+ 	    	
+ 	 		//alert(txt);
+ 	    	document.getElementById("users").innerHTML = txt;
+ 	 		
+ 	 	}
+	}
+	
+	
+	
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUsersToInvite", false);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+
+	
+}
+
+</script>
+
+<script>
+             
+	function sendWorkspaceInvite() {
+		
+		//alert("reaching here!");
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		var email = document.forms["workspaceInviteForm"]["u_email"].value;
+		//alert("invitees email:" + email);
+		var user_id = getUserId(email);
+		//alert("invitees id:" + user_id);
+		//window.alert("user_id  " + user_id);
+			
+			var jsObject = new Object();
+			jsObject.user_id = user_id;
+			jsObject.workspace_id = workspace_id;
+			var jsonString = JSON.stringify(jsObject);
+		
+			var xmlhttp = new XMLHttpRequest();
+		
+			xmlhttp.onreadystatechange = function() {
+	 	 		if (this.readyState == 4 && this.status == 200) {
+	    			
+	 	 			document.getElementById("put_text_here").innerHTML = "invited succesfully!";
+	    	
+	  			}
+			};
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/sendWorkspaceInvite", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+	}
+
+
+</script>
+
+
+<script>
+
+function getUserId(email) {
+	//var email = document.forms["workspaceInviteForm"]["u_email"].value;
+	
+	var returnedJson;
+	var userID;
+	var jsObject = new Object();
+	jsObject.user_email = email;
+	
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	
+	
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200) {
+			
+			
+			returnedJson = JSON.parse(this.responseText);
+			
+			userID = returnedJson.user_id;
+			
+		//	window.alert("in ready func: " + userID);
+			
+			
+			
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUserId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return userID;
+	
+	
+}
+
+</script>
+
+
+</head>
+<body>
+	<form name = "workspaceInviteForm" action = "javascript:sendWorkspaceInvite();" id = "rcorners2" method = "post"> 
+		<p>
+			Email : <input type="text" name="u_email" />
+		</p>
+		<input type="submit" value="Send Invite" />
+
+	</form>
+	<p align = "center" id = "demo"> </p>
+	<p align = "center" id = "put_text_here"> </p>
+	<p  align = "center"><a href = "After_Inside_Workspace.html">Workspace Home</a></p>
+	
+	<p align = "center"><button onclick="getUsersToInvite()">Check Users to Invite </button></p>
+	<p align = "center" id = "users"></p>
+</body>
+</html>

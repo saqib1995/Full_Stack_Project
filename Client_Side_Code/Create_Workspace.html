@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Create Workspace</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 175px; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+<script>
+	
+	function createWorkspaceFunc() {
+		
+		var user_id = sessionStorage.getItem("userID");
+		var workspace_name = document.forms["createWorkspaceForm"]["w_name"].value;
+		var workspace_description = document.forms["createWorkspaceForm"]["w_description"].value;
+		
+		if(user_id == "") {
+			window.alert("invalid user id");
+		}
+		
+		if(workspace_name == "") {
+			window.alert("Please enter name of the workspace");
+		}
+	
+		if(workspace_description == "") {
+			window.alert("Please enter workspace_description");
+		}
+		
+		
+		
+		var jsObject = new Object();
+		jsObject.user_id = user_id;
+		jsObject.workspace_name = workspace_name;
+		jsObject.workspace_description = workspace_description;
+		
+		var jsonString = JSON.stringify(jsObject);
+		
+		
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				getWorkspaceId(workspace_name);
+				
+				
+				location.href = "http://localhost:8082/JAX-RS-Starter/After_Inside_Workspace.html";
+				
+				
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/createWorkspace", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+		
+	}
+
+</script>
+
+<script>
+
+	function getWorkspaceId(workspace_name) {
+		//var workspace_name = document.forms["createWorkspaceForm"]["w_name"].value;
+		
+			
+		var jsObject = new Object();
+		jsObject.workspace_name = workspace_name;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				var returnedJson = JSON.parse(this.responseText);
+				
+				var workspaceID = returnedJson.workspace_id;
+				
+				sessionStorage.setItem("workspaceID" , workspaceID);
+				
+				
+				
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getWorkspaceId", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+	}
+
+</script>
+
+
+
+</head>
+
+
+<body>
+	<form name = "createWorkspaceForm" id = "rcorners2" action="javascript:createWorkspaceFunc();" method="post">
+		<p>
+			Workspace Name : <input type="text" name="w_name" />
+		</p>
+		<p>
+			Workspace Description : <input type="text" name="w_description" />
+		</p>
+		
+		<input type="submit" value="Create Workspace"/>
+	</form>
+	
+	<p id = "demo"> </p>
+</body>
+</html>

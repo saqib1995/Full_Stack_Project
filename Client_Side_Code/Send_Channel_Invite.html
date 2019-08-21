@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Send Channel Invite</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 100px; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script>
+
+	function sendChannelInvite() {
+		var invitee_email = document.forms["channelInviteForm"]["u_email"].value;
+		var user_id = getUserId(invitee_email);
+		var workspace_id = sessionStorage.getItem("workspaceID");
+		var channel_id = sessionStorage.getItem("channelID");
+		
+		var jsObject = new Object();
+		jsObject.user_id = user_id;
+		jsObject.workspace_id = workspace_id;
+		jsObject.channel_id = channel_id;
+		
+		var jsonString = JSON.stringify(jsObject);
+		
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+	 	 	if (this.readyState == 4 && this.status == 200) {
+	    		
+	 	 		document.getElementById("demo").innerHTML = "Invite Send!";
+	    	
+	  		}
+		};
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/sendChannelInvite", true);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	}
+
+
+</script>
+
+
+<script>
+
+function getUserId(email) {
+	
+	//alert("in get user id now: " + email);
+	
+	var returnedJson;
+	var userID;
+	var jsObject = new Object();
+	jsObject.user_email = email;
+	
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	
+	
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			returnedJson = JSON.parse(this.responseText);
+			//alert(returnedJson);
+			userID = returnedJson.user_id;
+			//alert("in get user id" + userID);
+			
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUserId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return userID;
+	
+	
+}
+
+</script>
+
+
+
+
+</head>
+<body>
+	<form name = "channelInviteForm" action = "javascript:sendChannelInvite();" id = "rcorners2" method = "post"> 
+		<p>
+			Email : <input type="text" name="u_email" />
+		</p>
+		<input type="submit" value="Send Invite" />
+	</form>
+	<p  align = "center"><a href = "After_Inside_Channel.html">Channel Home</a></p>
+	<p id = "demo"> </p>
+</body>
+</html>

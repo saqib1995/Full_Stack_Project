@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Sign Up</title>
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 320px; 
+  margin:auto;
+}
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+	<script>
+	
+	function signUpFunc() {
+
+		var name = document.forms["sign_up"]["u_name"].value;
+		var nickname = document.forms["sign_up"]["u_nickname"].value;
+		var email = document.forms["sign_up"]["u_email"].value;
+		var password = document.forms["sign_up"]["u_password"].value;
+		
+		
+		
+		
+		
+		if(name == "") {
+			window.alert("Please enter your name");
+			return false;
+		}
+	
+		if(nickname == "") {
+			window.alert("Please enter your nickname");
+			return false;
+		}
+		
+		if(email == "") {
+			window.alert("Please enter your email address");
+			return false;
+		}
+	
+		if(password == "") {
+			window.alert("Please enter your password");
+			return false;
+		}
+		
+		
+		
+		var status = getUserIdSecond(email);
+		
+		//alert("status in sign up func: " + status);
+		if(status === true) {
+			
+		
+			var jsObject = new Object();
+			jsObject.name = name;
+			jsObject.nickname = nickname;
+			jsObject.email = email;
+			jsObject.password = password;
+		
+			var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		
+			var xmlhttp = new XMLHttpRequest();
+		
+			xmlhttp.onreadystatechange = function() {
+				if(this.readyState == 4 && this.status == 200) {
+				//document.getElementById("demo").innerHTML = this.responseText;
+				alert("after ready");
+				//setTimeout(getUserId(email), 1000);
+				getUserId(email);
+				location.href = "http://localhost:8082/JAX-RS-Starter/After_Login.html";
+				
+				//window.alert(this.responseText);
+				}	
+			}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/adduser", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+		
+		
+		//sessionStorage.setItem("email", email);
+		
+		
+		} else {
+			document.getElementById("alert_message").innerHTML = "email already exists";
+		}
+	}
+
+</script>
+<script>
+
+	function getUserId(email) {
+		//var email = document.forms["sign_up"]["u_email"].value;
+		//alert("in get user id" + email);
+		var jsObject = new Object();
+		jsObject.user_email = email;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				var returnedJson = JSON.parse(this.responseText);
+				
+			//	window.alert(returnedJson);
+				var userID = returnedJson.user_id;
+				
+				
+				sessionStorage.setItem("userID" , userID);
+				
+				
+				
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUserId", false);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+	}
+
+</script>
+
+<script>
+
+function clearSession() {
+	sessionStorage.clear();
+}
+
+</script>
+
+<script>
+
+
+/*
+function checkEmailExists(email) {
+	
+	alert("int check email: "+ email);
+	var jsObject = new Object();
+	jsObject.email = email;
+	
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	
+	var xmlhttp = new XMLHttpRequest();
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			
+			document.getElementById("emailConfirm").innerHTML = "email already exists";
+			
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/adduser", true);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+}
+*/
+
+
+
+function getUserIdSecond(email) {
+	//var email = document.forms["sign_in"]["u_email"].value;
+	
+	//window.alert(email);
+	var jsObject = new Object();
+	jsObject.user_email = email;
+	var status;
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	
+	var status;
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			var returnedJson = JSON.parse(this.responseText);
+			
+			var userID = returnedJson.user_id;
+			//alert("in get user id second: " + userID);
+			
+			if(userID === undefined) {
+				status = true;
+				
+			} else {
+				status = false;
+			}
+			//alert(status);
+			
+			//alert("check what it returns:" + returnedJson);
+			//alert("againnnnnn:" + userID);
+			//var userID = returnedJson.user_id;
+			
+			
+			
+			
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUserId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return status;
+}
+
+
+</script>
+
+
+
+</head>
+<body onload = "clearSession()">
+	 
+	<div id = "demo"> </div>
+	
+	<form id = "rcorners2" name = "sign_up" action="javascript:signUpFunc();"  method="post">
+		<h4> SIGN UP </h4>
+		<p>
+			Name : <input type="text" name="u_name" id = "u_name"/>
+		</p>
+		<p>
+			Nick Name : <input type="text" name="u_nickname" id = "u_nickname"/>
+		</p>
+		<p>
+			Email : <input type="email" name="u_email" id = "u_email"/>
+		</p>
+		<p>
+			Password : <input type="password" name="u_password" id = "u_password"/>
+		</p>
+		<!-- <input onclick = "window.location.href = 'app/user/After_Login.html';" type="submit" value="Sign Up" /> --> 
+		<button>submit</button> 
+		<p id = "alert_message"> </p>
+	</form>
+	
+	
+</body>
+</html>

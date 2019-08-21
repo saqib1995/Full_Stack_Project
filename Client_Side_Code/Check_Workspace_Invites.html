@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Check_Workspace_Invites</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script> 
+
+function myFunc() {
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	var jsonString = JSON.stringify(jsObject);
+	
+	
+	var xmlhttp = new XMLHttpRequest();
+	var txt = "";
+	var x;
+	var workspaceName;
+	var workspace_id;
+	xmlhttp.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+    	var myObj = JSON.parse(this.responseText);
+    	//document.getElementById("demo").innerHTML = this.responseText;
+    	
+    	txt += "<p> your invites are, <br>"
+    	for (x in myObj.workspaces) {
+    		txt += "workspaces name:" + myObj.workspaces[x].workspace_name;
+    		workspaceName = myObj.workspaces[x].workspace_name;
+    		workspace_id = getWorkspaceId();
+    		txt += "<t> <button onclick = \"acceptFunc(" + workspace_id + ")\"> accept </button>  <button > decline </button><br>";
+    	}
+    	txt += "</p>"
+    	document.getElementById("demo").innerHTML = txt;
+    	
+    	
+  		}
+	};
+xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/checkWorkspaceInvites", true);
+xmlhttp.setRequestHeader("Content-type", "application/json");
+xmlhttp.send(jsonString);
+
+}
+</script>
+<script>
+function acceptFunc(workspace_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("output").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/acceptWorkspaceInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+<script>
+function declineFunc(workspace_id) {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	var user_id = sessionStorage.getItem("userID");
+	
+	var jsObject = new Object();
+	jsObject.workspace_id = workspace_id;
+	jsObject.user_id = user_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("output").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/declineWorkspaceInvite", true);
+	xmlhttpone.setRequestHeader("Content-type", "application/json");
+	xmlhttpone.send(jsonString);
+	
+}
+
+</script>
+
+
+
+
+</head>
+<body onload = "myFunc()">
+
+
+<p id = "demo">
+
+
+
+</p>
+
+<p id = "output"> </p>
+
+
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Sign In</title>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+<script>
+	
+	
+	function signInFunc() {
+		
+		var outputText = "";
+		
+		var email = document.forms["sign_in"]["u_email"].value;
+		var password = document.forms["sign_in"]["u_password"].value;
+		
+		
+		
+		if(email == "") {
+			window.alert("Please enter your email address");
+			return false;
+		}
+	
+		if(password == "") {
+			window.alert("Please enter your password");
+			return false;
+		}
+		
+		
+		var jsObject = new Object();
+		
+		
+		jsObject.email = email;
+		jsObject.password = password;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				//document.getElementById("demo").innerHTML = this.responseText;
+				
+				var status = this.responseText;
+				
+				if (status == "true") {
+					
+					getUserId(email);
+					location.href = "http://localhost:8082/JAX-RS-Starter/After_Login.html";
+					
+				} else {
+					
+					outputText += "Sorry, no account found under provided details! <br>";
+					outputText += "<a href = \"http://localhost:8082/JAX-RS-Starter/Sign_Up.html\">Sign Up</a>";
+					
+					document.getElementById("demo").innerHTML = outputText;
+					return false;
+				}
+				
+				
+				
+				//window.alert(this.responseText);
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/verifyuser", true);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+
+		
+	}
+	
+	
+	
+	
+	
+</script>
+
+<script>
+
+	function getUserId(email) {
+		//var email = document.forms["sign_in"]["u_email"].value;
+		
+		//window.alert(email);
+		var jsObject = new Object();
+		jsObject.user_email = email;
+		
+		var jsonString = JSON.stringify(jsObject);
+		//window.alert(jsonString);
+		var xmlhttp = new XMLHttpRequest();
+		
+		xmlhttp.onreadystatechange = function() {
+			if(this.readyState == 4 && this.status == 200) {
+				
+				var returnedJson = JSON.parse(this.responseText);
+				
+				var userID = returnedJson.user_id;
+				//window.alert(userID);
+				sessionStorage.setItem("userID" , userID);
+				
+				
+				
+			}
+		}
+		
+		xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getUserId", false);
+		xmlhttp.setRequestHeader("Content-type", "application/json");
+		xmlhttp.send(jsonString);
+	}
+
+</script>
+
+
+
+
+<style>
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid black;
+  padding: 20px; 
+  width: 200px;
+  height: 260px; 
+  margin:auto;
+}
+</style>
+
+<script>
+
+function clearSession() {
+	sessionStorage.clear();
+}
+
+</script>
+
+</head>
+<body onload = "clearSession()">
+
+
+	<p> <h1 align = "center"> SNICKR </h1> 
+
+	<form id = "rcorners2" action="javascript:signInFunc();" method="post" name = "sign_in" >
+		<h4> SIGN IN </h4>
+		<p>
+			Email  <input type="text" name="u_email" />
+		</p>
+		<p>
+			Password  <input type="password" name="u_password" />
+		</p>
+		<input type="submit" value="Sign In" />
+		<p><a href = "Forgot_Password.html">Forgot Password?</a></p>
+		<p> New User?<a href = "Sign_Up.html">Sign Up</a></p>
+		
+	</form>
+	
+	<p id = "demo" align = "center"> </p>
+	
+
+</body>
+</html>

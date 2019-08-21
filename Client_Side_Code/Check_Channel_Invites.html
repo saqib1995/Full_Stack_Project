@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Check_Channel_Invites</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script> 
+
+function myFunc() {
+	
+	var user_id = sessionStorage.getItem("userID");
+	var workspace_id = sessionStorage.getItem("workspaceID");
+	var jsObject = new Object();
+	jsObject.user_id = user_id;
+	jsObject.workspace_id = workspace_id;
+	var jsonString = JSON.stringify(jsObject);
+	
+	var channel_name;
+	
+	var xmlhttp = new XMLHttpRequest();
+	var txt = "";
+	var x;
+	xmlhttp.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+    	var myObj = JSON.parse(this.responseText);
+    	//document.getElementById("demo").innerHTML = this.responseText;
+    	
+    	txt += "<p> your invites are, <br>"
+    	for (x in myObj.channels) {
+    		txt += "channel name:" + myObj.channels[x].c_name;
+    		txt += "<t> <button onclick = \"acceptFunc()\"> accept </button>  <button> decline </button><br>";
+    	}
+    	txt += "</p>"
+    	document.getElementById("demo").innerHTML = txt;
+    	
+    	
+  		}
+	};
+	
+xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/checkChannelInvites", true);
+xmlhttp.setRequestHeader("Content-type", "application/json");
+xmlhttp.send(jsonString);
+
+}
+</script>
+
+<script>
+
+function getChannelId(channel_name, workspace_id) {
+		
+	var jsObject = new Object();
+	jsObject.channel_name = channel_name;
+	jsObject.workspace_id = workspace_id;
+	
+	var jsonString = JSON.stringify(jsObject);
+	//window.alert(jsonString);
+	var xmlhttp = new XMLHttpRequest();
+	
+	
+	
+	xmlhttp.onreadystatechange = function() {
+		if(this.readyState == 4 && this.status == 200) {
+			
+			var returnedJson = JSON.parse(this.responseText);
+			
+			var channelID = returnedJson.channel_id;
+	
+		}
+	}
+	
+	xmlhttp.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/getChannelId", false);
+	xmlhttp.setRequestHeader("Content-type", "application/json");
+	xmlhttp.send(jsonString);
+	
+	return channelID;
+	
+	
+	
+}
+
+
+</script>
+
+
+
+<script>
+function acceptFunc() {
+	var xmlhttpone = new XMLHttpRequest();
+	
+	xmlhttpone.onreadystatechange = function() {
+ 	 	if (this.readyState == 4 && this.status == 200) {
+ 	 		document.getElementById("output").innerHTML = this.responseText;
+ 	 		
+ 	 	}
+	}
+	xmlhttpone.open("POST", "http://localhost:8082/JAX-RS-Starter/app/user/acceptChannelInvite", true);
+	xmlhttpone.send();
+	
+}
+
+</script>
+
+</head>
+<body onload = "myFunc()">
+
+
+<p id = "demo">
+
+
+
+</p>
+
+<p id = "output"> </p>
+
+
+
+</body>
+</html>
