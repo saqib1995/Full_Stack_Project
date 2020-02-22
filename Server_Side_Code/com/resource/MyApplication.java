@@ -4,24 +4,17 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-
-//import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java_jdbc.Driver;
-
-//import java.sql.*;
 
 @Path("/user")
 public class MyApplication {
 	Driver d = new Driver();
-	
-	
+    
 	@POST
 	@Path("/addAllUser")
 	public Response addAllUser(String jsonString) {
@@ -30,11 +23,9 @@ public class MyApplication {
 			
 		try {
 			JSONObject jsonObject = new JSONObject(jsonString);
-			
 			channel_id = jsonObject.getInt("channel_id");
 			workspace_id = jsonObject.getInt("workspace_id");
 			d.addAllUser(channel_id, workspace_id);
-			
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -72,7 +63,6 @@ public class MyApplication {
 		int user_id;
 		int channel_id;
 		String message;
-		
 		String jsonValue = null;
 		
 		try {
@@ -383,10 +373,8 @@ public class MyApplication {
 			channel_id = jsonObject.getInt("channel_id");
 			d.insertIntoChannelUser(user_id, channel_id, workspace_id);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return Response.status(200).entity("Invited User Succesfully").build();
@@ -503,7 +491,6 @@ public class MyApplication {
 		try {
 			jsonObject = new JSONObject(jsonString);
 			user_id = jsonObject.getInt("user_id");
-			System.out.println("in hello resource:" + user_id);
 			returnedJson = d.getCurrentWorkspaces(user_id);
 		} catch (JSONException e) {
 			e.printStackTrace();
